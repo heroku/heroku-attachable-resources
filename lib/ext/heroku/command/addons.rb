@@ -61,7 +61,6 @@ module Heroku::Command
       else
 
       resources = Hash.new {|hash,key| hash[key] = {}}
-
       attachments.each do |attachment|
         resource = attachment["resource"]["name"]
         resources[resource]["Billing App"] = attachment["app"]["name"]
@@ -112,21 +111,39 @@ module Heroku::Command
     # list info for an addon
     #
     def info
-      addon = args.shift
-      raise CommandFailed.new("Missing add-on name") if addon.nil?
-      addon_info = heroku.addon(addon)
-      display("=== #{addon}")
-      max_length = addon_info.keys.map {|key| key.length}.max + 2
-      addon_info["price"] = if addon_info["price"]["cents"] == 0
-        "free"
+      argument = args.shift
+      raise CommandFailed.new("Missing add-on name") if argument.nil?
+      if resource_info = heroku.get_resource(argument) rescue nil
+        resource = {}
+        resource_info["attachments"].each do |attachment|
+          resource["Billing App"] = attachment["app"]["name"]
+          resource["Config"] ||= []
+          resource["Config"] << attachment["config_var"]
+          resource["Type"] = resource_info["type"]
+        end
+        resource["Config"] = resource["Config"].join(", ")
+
+        display("=== #{argument}")
+        max_length = resource.keys.map {|key| key.length}.max + 2
+        resource.keys.sort.each do |key|
+          display("#{key}: ".ljust(max_length), false)
+          display(resource[key])
+        end
       else
-        "$#{addon_info["price"]["cents"] / 100.0}/#{addon_info["price"]["unit"]}"
-      end
-      addon_info.keys.sort.each do |key|
-        next unless addon_info[key]
-        title_cased = key.split(" ").map {|word| word[0...1].upcase + word[1..-1]}.join(" ")
-        display("#{title_cased}: ".ljust(max_length), false)
-        display(addon_info[key])
+        addon_info = heroku.addon(argument)
+        display("=== #{addon}")
+        max_length = addon_info.keys.map {|key| key.length}.max + 2
+        addon_info["price"] = if addon_info["price"]["cents"] == 0
+          "free"
+        else
+          "$#{addon_info["price"]["cents"] / 100.0}/#{addon_info["price"]["unit"]}"
+        end
+        addon_info.keys.sort.each do |key|
+          next unless addon_info[key]
+          title_cased = key.split(" ").map {|word| word[0...1].upcase + word[1..-1]}.join(" ")
+          display("#{title_cased}: ".ljust(max_length), false)
+          display(addon_info[key])
+        end
       end
     end
 
