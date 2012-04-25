@@ -151,6 +151,8 @@ module Heroku::Command
     #
     # uninstall an addon
     #
+    # --config CONFIG  # a non-default config var to remove a resource from
+    #
     def remove
       return unless confirm_command
       options[:confirm] ||= app
@@ -160,7 +162,15 @@ module Heroku::Command
           if resource_info["attachments"].length > 0
             attachments = resource_info["attachments"].select {|attachment| attachment["app"]["name"] == app}
             if attachments.length > 1
-              config_var = attachments.first["config_var"]
+              unless config_var = extract_option('--config')
+                message = "#{name} matches:"
+                attachments.each do |attachment|
+                  message << "\n  #{attachment["config_var"]}"
+                end
+                message << "\nRun this command again with one of these and --config to continue."
+                raise CommandFailed.new(message)
+              end
+
               action("Removing #{name} from #{app}") do
                 heroku.delete_attachment(app, config_var)
               end
