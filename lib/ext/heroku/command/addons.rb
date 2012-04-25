@@ -8,21 +8,21 @@ module Heroku::Command
     #
     # install an addon
     #
-    #     --config CONFIG  # a non-default config var to use for attaching a resource
+    # --config CONFIG  # a non-default config var to use for attaching a resource
     #
     def add
       argument = args.first
-      options = if config_var = extract_option('--config', nil)
+      params = if config_var = extract_option('--config')
         { :config_var => config_var }
       else
         {}
       end
 
       if addon_info = heroku.addon(argument) rescue nil
-        if config_var
-          raise CommandFailed.new("--config is not a valid option for non-attachable addons")
-        end
         if addon_info["attachable"] == false
+          if config_var
+            raise CommandFailed.new("--config is not a valid option for non-attachable addons")
+          end
           # new non-attachable resource
           configure_addon('Adding') do |addon, config|
             heroku.install_addon(app, addon, config)
@@ -31,7 +31,7 @@ module Heroku::Command
           # new attachable resource
           resource_info = nil
           action("Adding #{argument} to #{app}") do
-            resource_info = heroku.add_resource(app, argument, options)
+            resource_info = heroku.add_resource(app, argument, params)
           end
           attachment = resource_info["attachments"].detect {|attachment| attachment["app"]["name"] == app}
           display("#{resource_info["name"]} assigned to #{attachment["config_var"]}")
@@ -40,7 +40,7 @@ module Heroku::Command
         # existing attachable resource
         attachment_info = nil
         action("Adding #{argument} to #{app}") do
-          attachment_info = heroku.add_attachment(app, argument, options)
+          attachment_info = heroku.add_attachment(app, argument, params)
         end
         display("#{argument} assigned to #{attachment_info["config_var"]}")
       else
