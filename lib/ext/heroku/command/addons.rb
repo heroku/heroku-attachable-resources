@@ -131,7 +131,7 @@ module Heroku::Command
         end
       else
         addon_info = heroku.addon(argument)
-        display("=== #{addon}")
+        display("=== #{addon_info['name']}")
         max_length = addon_info.keys.map {|key| key.length}.max + 2
         addon_info["price"] = if addon_info["price"]["cents"] == 0
           "free"
