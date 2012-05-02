@@ -63,7 +63,7 @@ module Heroku::Command
       resources = Hash.new {|hash,key| hash[key] = {}}
       attachments.each do |attachment|
         resource = attachment["resource"]["name"]
-        resources[resource]["Billing App"] = attachment["billing_app"]["name"]
+        resources[resource]["Billing App"] = attachment["resource"]["billing_app"]["name"]
         resources[resource]["Config"] ||= []
         resources[resource]["Config"] << attachment["config_var"]
         type = attachment["resource"]["type"]
@@ -116,7 +116,7 @@ module Heroku::Command
       if resource_info = heroku.get_resource(argument) rescue nil
         resource = {}
         resource_info["attachments"].each do |attachment|
-          resource["Billing App"] = attachment["billing_app"]["name"]
+          resource["Billing App"] = resource_info["billing_app"]["name"]
           resource["Config"] ||= []
           resource["Config"] << attachment["config_var"]
           resource["Type"] = resource_info["type"]
