@@ -37,7 +37,7 @@ module Heroku::Command
           end
           attachment = resource_info["attachments"].detect {|attachment| attachment["app"]["name"] == app}
           display("#{resource_info["name"]} assigned to #{attachment["config_var"]}")
-          display("Use `heroku addons:docs #{addon}` to view documentation.")
+          display("Use `heroku addons:docs #{argument}` to view documentation.")
         end
       elsif resource_info = heroku.get_resource(argument) rescue nil
         # existing attachable resource
@@ -46,7 +46,7 @@ module Heroku::Command
           attachment_info = heroku.add_attachment(app, argument, params)
         end
         display("#{argument} assigned to #{attachment_info["config_var"]}")
-        display("Use `heroku addons:docs #{addon}` to view documentation.")
+        display("Use `heroku addons:docs #{argument}` to view documentation.")
       else
         display("Addon or resource not found")
       end
