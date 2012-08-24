@@ -150,6 +150,10 @@ module Heroku::Command
       return unless confirm_command
       options[:confirm] ||= app
 
+      if args.empty?
+        error("Usage: heroku addons:remove ADDON | NAME\nMust specify ADDON or NAME to remove.")
+      end
+
       args.each do |name|
         if resource_info = heroku.get_resource(name) rescue nil
           if resource_info["attachments"].length > 0
@@ -191,8 +195,8 @@ module Heroku::Command
           action("Removing #{name} from #{app}") do
             messages = addon_run { heroku.uninstall_addon(app, name, :confirm => options[:confirm]) }
           end
-          output messages[:attachment] if messages[:attachment]
-          output messages[:message]
+          display(messages[:attachment]) if messages[:attachment]
+          display(messages[:message])
         else
           display("Addon or resource not found")
         end
