@@ -164,7 +164,7 @@ module Heroku::Command
           if resource_info["attachments"].length > 0
             attachments = resource_info["attachments"].select {|attachment| attachment["app"]["name"] == app}
             if attachments.length > 1
-              unless config_var = extract_option('--config')
+              unless config_var = options[:config]
                 message = "#{name} matches:"
                 attachments.each do |attachment|
                   message << "\n  #{attachment["config_var"]}"
