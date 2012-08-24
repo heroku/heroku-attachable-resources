@@ -4,6 +4,8 @@ module Heroku::Command
   #
   class Addons < Base
 
+    include Heroku::Helpers::HerokuPostgresql
+
     # addons:add ADDON | NAME
     #
     # install an addon
@@ -11,12 +13,12 @@ module Heroku::Command
     # --config CONFIG  # a non-default config var to use for attaching a resource
     #
     def add
-      argument = args.first
-      params = if config_var = extract_option('--config')
-        { :config_var => config_var }
-      else
-        {}
+      argument = shift_argument
+      params = {}
+      if config_var = options[:config]
+        params.merge!({ :config_var => config_var })
       end
+      hpg_translate_fork_and_follow(argument, options)
 
       if addon_info = heroku.addon(argument) rescue nil
         if addon_info["attachable"] == false
