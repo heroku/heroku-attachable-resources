@@ -20,7 +20,7 @@ module Heroku::Command
           params[key] = options[key]
         end
       end
-      hpg_translate_fork_and_follow(argument, options)
+      hpg_translate_fork_and_follow(argument, params)
 
       if addon_info = heroku.addon(argument) rescue nil
         if addon_info["attachable"] == false
