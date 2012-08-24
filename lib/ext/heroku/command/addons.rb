@@ -196,7 +196,7 @@ module Heroku::Command
             messages = addon_run { heroku.uninstall_addon(app, name, :confirm => options[:confirm]) }
           end
           display(messages[:attachment]) if messages[:attachment]
-          display(messages[:message])
+          display(messages[:message]) if messages[:message]
         else
           display("Addon or resource not found")
         end
