@@ -37,18 +37,18 @@ module Heroku::Command
           action("Adding #{argument} to #{app}") do
             resource_info = heroku.add_resource(app, argument, params)
           end
-          attachment = resource_info["attachments"].detect {|attachment| attachment["app"]["name"] == app}
+          attachment = resource_info["attachments"].detect {|a| a["app"]["name"] == app}
           display("#{resource_info["name"]} assigned to #{attachment["config_var"]}")
-          display("Use `heroku addons:docs #{argument}` to view documentation.")
+          display("Use `heroku addons:docs #{resource_info['type']}` to view documentation.")
         end
       elsif resource_info = heroku.get_resource(argument) rescue nil
         # existing attachable resource
-        attachment_info = nil
+        attachment = nil
         action("Adding #{argument} to #{app}") do
-          attachment_info = heroku.add_attachment(app, argument, params)
+          attachment = heroku.add_attachment(app, argument, params)
         end
-        display("#{argument} assigned to #{attachment_info["config_var"]}")
-        display("Use `heroku addons:docs #{argument}` to view documentation.")
+        display("#{argument} assigned to #{attachment["config_var"]}")
+        display("Use `heroku addons:docs #{resource_info['type']}` to view documentation.")
       else
         display("Addon or resource not found")
       end
@@ -174,14 +174,14 @@ module Heroku::Command
                 heroku.delete_attachment(app, config_var)
               end
               display("#{name} no longer assigned to #{config_var}")
-              display("Use `heroku addons:docs #{name}` to view documentation.")
+              display("Use `heroku addons:docs #{resource_info['type']}` to view documentation.")
             else
               attachment = resource_info["attachments"].first
               action("Removing #{name} from #{app}") do
                 heroku.delete_resource(name)
               end
               display("#{name} no longer assigned to #{attachment["config_var"]}")
-              display("Use `heroku addons:docs #{name}` to view documentation.")
+              display("Use `heroku addons:docs #{resource_info['type']}` to view documentation.")
             end
           else
             attachment = resource_info["attachments"].first
@@ -189,7 +189,7 @@ module Heroku::Command
               heroku.delete_resource(name)
             end
             display("#{name} no longer assigned to #{attachment["config_var"]}")
-            display("Use `heroku addons:docs #{name}` to view documentation.")
+            display("Use `heroku addons:docs #{resource_info['type']}` to view documentation.")
           end
         elsif addon_info = heroku.addon(name) rescue nil
           # non resource
