@@ -15,10 +15,11 @@ module Heroku::Command
     def add
       argument = shift_argument
       params = {}
-      [:config, :confirm].each do |key|
-        if options[key]
-          params[key] = options[key]
-        end
+      if options[:config]
+        params[:config_var] = options[:config]
+      end
+      if options[:confirm]
+        params[:confirm] = options[:confirm]
       end
       hpg_translate_fork_and_follow(argument, params)
 
