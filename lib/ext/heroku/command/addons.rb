@@ -172,14 +172,14 @@ module Heroku::Command
                 heroku.delete_attachment(app, config_var)
               end
               display("#{name} no longer assigned to #{config_var}")
-              display("Use `heroku addons:docs #{addon}` to view documentation.")
+              display("Use `heroku addons:docs #{name}` to view documentation.")
             else
               attachment = resource_info["attachments"].first
               action("Removing #{name} from #{app}") do
                 heroku.delete_resource(name)
               end
               display("#{name} no longer assigned to #{attachment["config_var"]}")
-              display("Use `heroku addons:docs #{addon}` to view documentation.")
+              display("Use `heroku addons:docs #{name}` to view documentation.")
             end
           else
             attachment = resource_info["attachments"].first
@@ -187,7 +187,7 @@ module Heroku::Command
               heroku.delete_resource(name)
             end
             display("#{name} no longer assigned to #{attachment["config_var"]}")
-            display("Use `heroku addons:docs #{addon}` to view documentation.")
+            display("Use `heroku addons:docs #{name}` to view documentation.")
           end
         elsif addon_info = heroku.addon(name) rescue nil
           # non resource
