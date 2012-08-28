@@ -25,7 +25,7 @@ module Heroku::Command
 
       if addon_info = heroku.addon(argument) rescue nil
         if addon_info["attachable"] == false
-          if config_var
+          if params[:config_var]
             raise CommandFailed.new("--config is not a valid option for non-attachable addons")
           end
           # new non-attachable resource
