@@ -159,37 +159,35 @@ module Heroku::Command
 
       args.each do |name|
         if resource_info = heroku.get_resource(name) rescue nil
-          if resource_info["attachments"].length > 0
-            attachments = resource_info["attachments"].select {|attachment| attachment["app"]["name"] == app}
-            if attachments.length > 1
-              unless config_var = options[:config]
-                message = "#{name} matches:"
-                attachments.each do |attachment|
-                  message << "\n  #{attachment["config_var"]}"
-                end
-                message << "\nRun this command again with one of these and --config to continue."
-                raise CommandFailed.new(message)
+          attachments = resource_info["attachments"]
+          # not the resource's final attachment so we just want to destroy an
+          # attachment
+          if attachments.length > 1
+            # may need to disambiguate if there are > 1 attachments for this
+            # particular app
+            attachments = attachments.select {|attachment| attachment["app"]["name"] == app}
+            if !options[:config] && attachments.length != 1
+              message = "#{name} matches:"
+              attachments.each do |attachment|
+                message << "\n  #{attachment["config_var"]}"
               end
-
-              action("Removing #{name} from #{app}") do
-                heroku.delete_attachment(app, config_var)
-              end
-              display("#{name} no longer assigned to #{config_var}.")
-              display("Use `heroku addons:docs #{resource_info['type']}` to view documentation.")
-            else
-              attachment = resource_info["attachments"].first
-              action("Removing #{name} from #{app}") do
-                heroku.delete_resource(name)
-              end
-              display("#{name} no longer assigned to #{attachment["config_var"]}.")
-              display("Use `heroku addons:docs #{resource_info['type']}` to view documentation.")
+              message << "\nRun this command again with one of these and --config to continue."
+              raise CommandFailed.new(message)
             end
+
+            config_var = options[:config] || attachments.first['config_var']
+            action("removing #{name} from #{app}") do
+              heroku.delete_attachment(app, config_var)
+            end
+            display("#{name} no longer assigned to #{config_var}.")
+            display("use `heroku addons:docs #{resource_info['type']}` to view documentation.")
+          # final attachment; destroy the resource itself
           else
             attachment = resource_info["attachments"].first
             action("Removing #{name} from #{app}") do
               heroku.delete_resource(name)
             end
-            display("#{name} no longer assigned to #{attachment["config_var"]}.")
+            display("#{name} no longer assigned to #{attachment['config_var']}.")
             display("Use `heroku addons:docs #{resource_info['type']}` to view documentation.")
           end
         elsif addon_info = heroku.addon(name) rescue nil
