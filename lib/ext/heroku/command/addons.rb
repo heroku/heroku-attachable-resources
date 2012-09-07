@@ -135,7 +135,7 @@ module Heroku::Command
           "$#{addon_info["price"]["cents"] / 100.0}/#{addon_info["price"]["unit"]}"
         end
         addon_info.reject! {|key, value| value.nil?}
-        addon_info.each do |key, value|
+        addon_info.keys.each do |key|
           title_cased = key.split(/[_ ]/).map {|word| word[0...1].upcase + word[1..-1]}.join(" ")
           addon_info[title_cased] = addon_info.delete(key)
         end
