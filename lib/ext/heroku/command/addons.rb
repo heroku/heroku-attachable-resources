@@ -14,14 +14,14 @@ module Heroku::Command
     #
     def add
       argument = shift_argument
-      params = {}
+      params = {:config => parse_options(invalid_arguments)}
       if options[:config]
         params[:config_var] = options[:config]
       end
       if options[:confirm]
         params[:confirm] = options[:confirm]
       end
-      hpg_translate_fork_and_follow(argument, params)
+      hpg_translate_fork_and_follow(argument, params[:config])
 
       if addon_info = heroku.addon(argument) rescue nil
         if addon_info["attachable"] == false
