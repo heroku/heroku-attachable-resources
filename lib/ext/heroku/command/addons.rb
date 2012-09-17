@@ -176,11 +176,11 @@ module Heroku::Command
             end
 
             config_var = options[:config] || attachments.first['config_var']
-            action("removing #{name} from #{app}") do
+            action("Removing #{name} from #{app}") do
               heroku.delete_attachment(app, config_var)
             end
             display("#{name} no longer assigned to #{config_var}.")
-            display("use `heroku addons:docs #{resource_info['type']}` to view documentation.")
+            display("Use `heroku addons:docs #{resource_info['type']}` to view documentation.")
           # final attachment; destroy the resource itself
           else
             attachment = resource_info["attachments"].first
