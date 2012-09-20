@@ -3,6 +3,3 @@ require("#{File.dirname(__FILE__)}/lib/ext/heroku/client")
 
 require("heroku/command/addons")
 require("#{File.dirname(__FILE__)}/lib/ext/heroku/command/addons")
-
-require("heroku/command/pg")
-require("#{File.dirname(__FILE__)}/lib/ext/heroku/command/pg")
