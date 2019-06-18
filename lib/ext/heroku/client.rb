@@ -20,7 +20,7 @@ class Heroku::Client
   end
 
   def delete_attachment(app, config_var)
-    json_decode(delete("/apps/#{app}/attachments/#{config_var}"))
+    json_decode(delete("/apps/#{app}/attachments/#{URI::encode(config_var)}"))
   end
 
   def get_attachments(app)
